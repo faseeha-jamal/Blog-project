@@ -1,7 +1,9 @@
 import React from 'react'
 
-export const VerifyOtpPage = () => {
+function VerifyOtpPage() {
   return (
     <div>VerifyOtpPage</div>
   )
 }
+
+export default VerifyOtpPage
