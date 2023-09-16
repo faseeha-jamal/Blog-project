@@ -125,6 +125,12 @@ function LandingPage() {
           </div>
         </div>
       </div>
+      <form action="" className="flex flex-col gap-5 w-3/4 p-10 items-center ">
+        <input className="bg-transparent border-2 border-white" type="text" placeholder="Enter your Email" />
+        <input className="bg-transparent border-2 border-white" type="password" placeholder="Enter your password" />
+        <input className="bg-transparent border-2 border-white" type="password" placeholder="conform password" />
+        <button type="submit" className="border-2 border-white px-10 py-1">Done</button>
+      </form>
     </div>
   );
 }
