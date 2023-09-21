@@ -5,20 +5,14 @@ import morgan from "morgan";
 import connectDatabase from "./config/database.js";
 import { userRouter } from "./routes/userRouter.js";
 
-
 const app = express();
+connectDatabase();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(morgan("dev"));
 
-connectDatabase();
-
-
 app.use("/api", userRouter);
-
-
 
 app.use((err, req, res, next) => {
   res.status(404).json({ success: false, status: 500, message: "Something went wrong!"});
