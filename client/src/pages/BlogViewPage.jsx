@@ -12,7 +12,7 @@ function BlogViewPage() {
       }
    
   return (
-    <div className="w-full bg-black text-white font-serif pb-10">
+    <div className="w-full text-black font-serif pb-10">
       <Navbar />
       {/* maindiv */}
       <div className="w-[90%] m-auto">

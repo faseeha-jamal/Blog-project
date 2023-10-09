@@ -2,9 +2,9 @@ import React from "react";
 
 function BlogCard({image,profileImg,profileName,text}) {
   return (
-    <div className="w-[90%] shadow-lg m-auto py-8 my-5 bg-[rgb(12,13,13)] md:w-[45%] lg:w-[45%] rounded-b-3xl rounded-t-xl">
+    <div className="w-[90%] shadow-lg m-auto py-3 my-5 bg-[rgb(234,235,235)] md:w-[45%] lg:w-[45%] rounded-b-3xl rounded-t-xl">
       <div className="">
-        <img src={image} alt="" className="w-[90%] m-auto" />
+        <img src={image} alt="" className="w-[90%] m-auto rounded-xl" />
       </div>
       <div className="p-3">
         {/* blog writer details  */}
@@ -16,7 +16,7 @@ function BlogCard({image,profileImg,profileName,text}) {
           />
           <p className="text-[11px] m-2 text-neutral-500">{profileName}</p>
         </div>
-        <p className="text-[11px]">{text}</p>
+        <p className="text-[11px] text-black">{text}</p>
       </div>
     </div>
   );

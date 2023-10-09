@@ -8,6 +8,7 @@ import  VerifyOtpPage  from '../pages/VerifyOtpPage';
 import  NotFound from "./NotFound";
 import BlogViewPage from '../pages/BlogViewPage';
 import OtpPage from '../pages/OtpPage';
+import ProfilePage from '../pages/ProfilePage';
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
     <Route path='/verify-otp' element={<VerifyOtpPage/>}/>
     <Route path='/blogview' element={<BlogViewPage/>}/>
     <Route path='/otp' element={<OtpPage/>}/>
+    <Route path='/profile' element={<ProfilePage/>}/>
     <Route path='*' element={<NotFound/>}/>
    </Routes>
   )

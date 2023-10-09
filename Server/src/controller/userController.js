@@ -6,6 +6,8 @@ import { generateOtp } from "../utils/servicess.js";
 import AuthModel from "../models/authModel.js";
 import { verifyOtpValidation } from "../utils/validations/verifyOtpValidation.js";
 import { signinValidation } from "../utils/validations/signinValidation.js";
+import { blogUploadValidation } from "../utils/validations/blogUploadValidation.js";
+import blogModel from "../models/blogModel.js";
 
 export const userSignupController = async (req, res, next) => {
   try {
@@ -25,10 +27,7 @@ export const userSignupController = async (req, res, next) => {
     const emailExists = await UserModel.findOne({ email });
 
     if (emailExists && emailExists.isVerified === false) {
-      const deleted = await UserModel.deleteOne({
-        email: email,
-        isVerified: false,
-      });
+      const deleted = await UserModel.findByIdAndDelete(emailExists._id)
     } else if (emailExists) {
       return res.status(400).json({
         status: 400,
@@ -67,12 +66,12 @@ export const userSignupController = async (req, res, next) => {
 
     const otp = generateOtp();
 
-    const emailOtpData = new AuthModel({
-      email: email,
-      otp: otp,
-    });
-
-    await emailOtpData.save();
+    await AuthModel.findOneAndUpdate(
+      { email },
+      { otp },
+      { upsert: true }
+    );
+    console.log("this is otp:",otp);
 
     return res.status(201).json({
       status: 201,
@@ -84,6 +83,7 @@ export const userSignupController = async (req, res, next) => {
     return next(error);
   }
 };
+
 
 export const verifyOtpController = async (req, res, next) => {
   try {
@@ -205,6 +205,7 @@ export const signinController = async (req, res, next) => {
       "secretkey",
       { expiresIn: "7d" }
     );
+    console.log(accessToken);
 
     return res.status(200).json({
       status: 200,
@@ -217,7 +218,97 @@ export const signinController = async (req, res, next) => {
         username: user.username
       }
     });
+  
   } catch (error) {
+    console.log(error);
     return next(error);
   }
 };
+
+
+export const blogUploadController = async (req, res, next) => {
+  let verifyToken;
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      console.log("this is bearer token",token);
+    if (!token) {
+      return res.status(401).json({
+        status: 401,
+        success: false,
+        message: "Unauthorized: Missing token",
+      });
+    }
+     verifyToken = await jwt.verify(token, "secretkey")
+     console.log("this is verify token",verifyToken);
+
+    } catch (error) {
+      if (!verifyToken || !verifyToken.userId) {
+        return res.status(401).json({
+          status: 401,
+          success: false,
+          message: "Unauthorized: Invalid token",
+        });
+      } 
+    }
+
+    try {
+      
+      const { value, error } = blogUploadValidation.validate(req.body, {abortEarly:true});
+
+      if(error){
+        return res.status(400).json({
+          status:400,
+          success:false,
+          message: error.message
+        })
+      }
+       
+      const { title, paragraph, image } = value;
+      
+      console.log("this is decoded token",verifyToken);
+      const img ="https://unsplash.com/photos/M1aV9mU3MTI;";
+      const authorId = verifyToken.userId
+
+      const newUploadBlog = new blogModel({
+        title:title,
+        paragraph:paragraph,
+        image:img,
+        authorId:authorId
+      })
+
+      const savedUploadBlog = await newUploadBlog.save()
+
+     res.status(200).json({
+      status:200,
+      success:true,
+      message:"Blog Uploaded successfully",
+      data:savedUploadBlog
+     })
+    } catch (error) {
+      console.log("this  is catch error", error);
+       next(error)
+    }
+}
+
+
+export const getForgetPasswordControll = async (req, res, next) => {
+    const { email } = req.params;
+    
+    const otp = generateOtp()
+
+    const emailOtpData = new AuthModel({
+      email:email,
+      otp:otp
+    });
+
+    const savedEmailOtp = await emailOtpData.save()
+
+    const verifyToken = jwt.sign({
+      _id:savedEmailOtp._id,
+      email:savedEmailOtp.email
+    })
+}
+
+export const postForgetPasswordControll = async (req, res, next) => {
+     
+}

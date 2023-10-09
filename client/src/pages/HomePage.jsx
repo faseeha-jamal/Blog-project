@@ -3,68 +3,73 @@ import Navbar from '../components/layout/Navbar'
 import Tag from '../components/common/Tag'
 import SearchField from '../components/common/SearchField'
 import BlogCard from '../components/common/BlogCard'
+import { useSelector } from 'react-redux';
 
 function HomePage() {
-  return (
-    <div className="w-full  bg-black text-white">
-    <div className="w-full">
-      {/* nav section */}
-      <Navbar/>
+  const username = useSelector((state) => state.userReducer.user.username)
 
-      <div className="w-[90%] lg:w-[90%] m-auto">
-        {/* blogname nav div  */}
-        <div className="w-full flex justify-between px-5 mt-10 md:flex-col">
-          <h1 className="text-3xl text-center">BLOG APP NAME</h1>
-          {/* Blog name nav  */}
-          <nav className=" ">
-            <a href="/" className="md:hidden">
-              <i class="fa-solid fa-bars text-2xl"></i>
-            </a>
-            <div className="hidden md:flex justify-center gap-5 text-xs mt-5 border-b-[1px] border-gray-300 p-5 w-full  ">
-              <a href="" className=" text-neutral-400 hover:text-black">
-                Home
+  return (
+    <div className="w-full  bg-whit text-white font-serif">
+      <div className="w-full">
+        {/* nav section */}
+        <Navbar/>
+
+        <div className="w-full lg:w-[90%] m-auto text-black">
+          {/* blogname nav div  */}
+          <div className="w-full flex justify-between px-5 mt-10 md:flex-col">
+            <h1 className="text-4xl text-center ">BLOG APP NAME</h1>
+            {/* Blog name nav  */}
+            <nav className=" ">
+              <a href="/" className="md:hidden">
+                <i class="fa-solid fa-bars text-2xl"></i>
               </a>
-              <select
-                name=""
-                id=""
-                className=" text-neutral-400 bg-transparent hover:text-black "
-              >
-                <option value="Catagaries">Catagaries</option>
-                <option value="Lifestyle">Lifestyle</option>
-                <option value="Food">Food</option>
-                <option value="Adventure">Adventure</option>
-                <option value="Travel">Travel</option>
-                <option value="Business">Business</option>
-              </select>
-              <a href="" className=" text-neutral-400 hover:text-black">
-                Aboute
-              </a>
-              <a href="" className=" text-neutral-400 hover:text-black">
-                Contact
-              </a>
-            </div>
-          </nav>
-        </div>
-        {/* blog card section  */}
-        <div className="w-11/12 m-auto">
-            <h2 className="text-2xl font-serif my-5 text-center">Latest Post</h2>
+              <div className="hidden md:flex justify-center gap-5 text-sm  mt-5 border-b-[1px] border-gray-300 p-5 w-full  ">
+                <p className=" text-neutral-500 hover:text-black"> Home</p>
+                <select
+                  name=""
+                  id=""
+                  className=" text-neutral-500 bg-transparent hover:text-black "
+                >
+                  <option value="Catagaries">Catagaries</option>
+                  <option value="Lifestyle">Lifestyle</option>
+                  <option value="Food">Food</option>
+                  <option value="Adventure">Adventure</option>
+                  <option value="Travel">Travel</option>
+                  <option value="Business">Business</option>
+                </select>
+                <p className=" text-neutral-500 hover:text-black">
+                  Profile
+                </p>
+                <p className=" text-neutral-500 hover:text-black">
+                  Aboute
+                </p>
+                <p className=" text-neutral-500 hover:text-black">
+                  Contact
+                </p>
+              </div>
+            </nav>
+          </div>
+          {/* latest post section  */}
+          <div className="w-11/12 m-auto my-10">
+            <h2 className="text-4xl font-serif ml-14 text-black">Latest Post</h2>
             <div className="w-full lg:flex gap-7 lg:w-[90%] m-auto">
               {/* card div  */}
               <div className="w-full border-b-[1px] border-zinc-600 md:flex flex-wrap gap-5 lg:w-[100%]">
                 {/* cards */}
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName="Faseeha Jamal vattoli" text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName="Faseeha Jamal vattoli" text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName="Faseeha Jamal vattoli" text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName="Faseeha Jamal vattoli" text="How to Find the Video Games of Yor Youth"/>            
+                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName={username} text="How to Find the Video Games of Yor Youth"/>
+                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName={username} text="How to Find the Video Games of Yor Youth"/>
+                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName={username} text="How to Find the Video Games of Yor Youth"/>
+                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName={username} text="How to Find the Video Games of Yor Youth"/>            
               </div>
-           </div>
-          </div>  
               
-              {/* right div  */}
+              {/* tag div  */}
               <div className="w-full lg:w-[30%]">
-                <SearchField type="text" placeHolder="Type key word and hit enter"/>                      
+                <div className=" m-auto mt-10 lg:w-full">
+                <SearchField type="text" placeHolder="Type key word and hit enter"/>  
+               </div>       
+                
                   {/* catagaries div  */}
-                  <div className="my-14 flex flex-col">
+                  <div className="my-14 flex flex-col text-black">
                     <a href="" className="text-md border-b-[1px] border-zinc-300 font-light p-2">
                       Catagaries
                     </a>
@@ -85,7 +90,7 @@ function HomePage() {
                     </a>
                   </div>
                   {/* tag div  */}
-                  <div className="">
+                  <div className="mt-">
                     <p className="text-md  border-b-[1px] border-zinc-100 p-2 font-light">
                       Tag
                     </p>
@@ -100,11 +105,12 @@ function HomePage() {
                   </div>
               </div>
 
-            
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default HomePage

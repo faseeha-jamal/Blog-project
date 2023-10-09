@@ -1,12 +1,17 @@
 import React from "react";
 
-function InputField({type,placeHolder,icon}) {
+function InputField({type,placeHolder,icon,name,onChange,value}) {
   return (
-    <div className="border-[1px] border-gray-600 rounded-md flex justify-between m-2 p-2 text-sm">
-      <input className="bg-transparent" 
+    <div className="border-[1px] border-gray-600 rounded-md flex justify-between m-2 p-1 text-sm">
+      <input className="bg-transparent w-full p-1" 
       type={type}
-       placeholder={placeHolder}/>
-      <i class="fa-regular fa-user"></i>
+       placeholder={placeHolder}
+       name={name}
+       onChange={onChange}
+       value={value}
+       />
+       
+      <i className="fa-regular fa-user"></i>
     </div>
   );
 }
