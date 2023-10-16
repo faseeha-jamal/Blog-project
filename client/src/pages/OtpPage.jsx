@@ -6,7 +6,7 @@ import InputField from "../components/common/InputField";
 import Button from "../components/common/Button";
 import { useNavigate } from "react-router-dom";
 import axiosIntance from "../app/config.js";
-import { setUser } from "../redux/reducers/userSlice";
+import { setAccesToken, setUser } from "../redux/reducers/userSlice";
 
 function OtpPage() {
   const verifyToken = useSelector((state) => state.userReducer.tokens.verifyToken);
@@ -34,8 +34,9 @@ function OtpPage() {
         });
 
         dispatch(setUser(response.data.user));
+        dispatch(setAccesToken(response.data.accessToken))
 
-        navigate("/home");
+        navigate("/user/home");
         
       } catch (error) {
         console.log("Error: ", error);

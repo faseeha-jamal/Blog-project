@@ -11,9 +11,7 @@ export const blogUploadValidation = Joi.object({
     "string.empty": "Paragraph can't be left empty",
     "any.required": "Paragraph is required",
   }),
-  image: Joi.string().required().messages({
-    "string.base": "Image must be a string",
-    "string.empty": "Image can't be left empty",
+  image: Joi.required().messages({
     "any.required": "Image is required",
   }),
 });

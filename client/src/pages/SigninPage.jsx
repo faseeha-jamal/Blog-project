@@ -29,7 +29,7 @@ function SigninPage() {
         dispatch(setAccesToken(response.data.accesToken))
         dispatch(setUser(response.data.user))
 
-        navigatae("/home")
+        navigatae("/user/home")
 
       } catch (error) {
         console.log("this catch error",error);

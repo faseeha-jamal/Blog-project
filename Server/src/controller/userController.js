@@ -8,6 +8,8 @@ import { verifyOtpValidation } from "../utils/validations/verifyOtpValidation.js
 import { signinValidation } from "../utils/validations/signinValidation.js";
 import { blogUploadValidation } from "../utils/validations/blogUploadValidation.js";
 import blogModel from "../models/blogModel.js";
+import {singleFileUpload} from "../middlewares/cloudinary.js"
+
 
 export const userSignupController = async (req, res, next) => {
   try {
@@ -159,6 +161,7 @@ export const verifyOtpController = async (req, res, next) => {
   }
 };
 
+
 export const signinController = async (req, res, next) => {
   try {
     const { value, error } = signinValidation.validate(req.body, {
@@ -227,33 +230,31 @@ export const signinController = async (req, res, next) => {
 
 
 export const blogUploadController = async (req, res, next) => {
-  let verifyToken;
     try {
-      const token = req.headers.authorization.split(" ")[1];
-      console.log("this is bearer token",token);
-    if (!token) {
-      return res.status(401).json({
-        status: 401,
-        success: false,
-        message: "Unauthorized: Missing token",
-      });
-    }
-     verifyToken = await jwt.verify(token, "secretkey")
-     console.log("this is verify token",verifyToken);
-
-    } catch (error) {
-      if (!verifyToken || !verifyToken.userId) {
-        return res.status(401).json({
-          status: 401,
+      const uploadedImage = await singleFileUpload(req.file);
+ 
+      if (!uploadedImage.url || !uploadedImage.public_id || !uploadedImage.signature) {
+        return res.status(400).json({
+          status: 400,
           success: false,
-          message: "Unauthorized: Invalid token",
+          message: "Image upload to Cloudinary failed",
         });
-      } 
-    }
+      }
+  
+      console.log("This is uploaded image URL", uploadedImage.url);
+      console.log("This is uploaded image public_id", uploadedImage.public_id);
+      console.log("This is uploaded image signature", uploadedImage.signature);
 
-    try {
-      
-      const { value, error } = blogUploadValidation.validate(req.body, {abortEarly:true});
+      const { value, error } = blogUploadValidation.validate(
+        {
+         title:req.body.title, 
+         paragraph:req.body.paragraph, 
+         image:uploadedImage
+       }, 
+       {
+          abortEarly:true 
+       });
+      console.log("this values",value);
 
       if(error){
         return res.status(400).json({
@@ -262,17 +263,16 @@ export const blogUploadController = async (req, res, next) => {
           message: error.message
         })
       }
-       
+
       const { title, paragraph, image } = value;
       
-      console.log("this is decoded token",verifyToken);
-      const img ="https://unsplash.com/photos/M1aV9mU3MTI;";
-      const authorId = verifyToken.userId
-
+      let verifyToken = req.verifyToken
+      const authorId = verifyToken.userId;
+     
       const newUploadBlog = new blogModel({
         title:title,
         paragraph:paragraph,
-        image:img,
+        image:image,
         authorId:authorId
       })
 
@@ -289,6 +289,14 @@ export const blogUploadController = async (req, res, next) => {
        next(error)
     }
 }
+
+
+
+
+
+
+
+
 
 
 export const getForgetPasswordControll = async (req, res, next) => {

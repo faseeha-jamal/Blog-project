@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
+import { useSelector } from "react-redux/es/hooks/useSelector";
 import { validationSchema } from "../utils/validations/profileValidation";
 import { BloggerDetails } from "../components/common/BloggerDetails";
 import Button from "../components/common/Button";
@@ -7,17 +8,41 @@ import { UserProfile } from "../components/common/UserProfile";
 import BlogCard from "../components/common/BlogCard";
 import InputField from "../components/common/InputField";
 import { Modal } from "../components/common/Modal";
+import  {axiosPrivate}  from "../app/config.js";
+import { Link } from "react-router-dom";
 
 const ProfilePage = () => {
+  const userName = useSelector((state) => state.userReducer.user.username)
+  const userEmail = useSelector((state) => state.userReducer.user.email)
+  const token = useSelector((state) => state.userReducer.tokens.verifyToken)
+  const axiosInstance = axiosPrivate(token)
+
   const formik = useFormik({
     initialValues: {
       title: "",
-      image: "",
+      image: null,
       paragraph: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log("this is values", values);
+    onSubmit: async (values) => {
+      console.log("onsubmit clicked");  
+      try {
+        const formData = new FormData();
+        formData.append("title",values.title);
+        formData.append("paragraph",values.paragraph);
+        formData.append("image",values.image);
+
+        console.log("ready to trigger");
+
+        const response = await axiosInstance.post("/blog",formData,{
+          headers:{
+            "Content-type":"multipart/form-data"
+          }
+        })
+        console.log("this is response",response);
+      } catch (error) {
+         console.log("this is catch error",error);
+      }
     },
   });
   const [myBlogs, setMyBlogs] = useState(false);
@@ -37,7 +62,9 @@ const ProfilePage = () => {
               <i class="fa-solid fa-bars text-4xl"></i>
             </a>
             <div className="hidden md:flex justify-center gap-5 text-sm  mt-5 border-b-[1px] border-gray-300 p-5 w-full  ">
-              <p className=" text-neutral-500 hover:text-black"> Home</p>
+            <Link to="/user/home">
+               <p className=" text-neutral-500 hover:text-black">Home</p>
+            </Link>
               <select
                 name=""
                 id=""
@@ -62,8 +89,8 @@ const ProfilePage = () => {
         <div className="w-full md:w-[30%] md:border-r-[1px] ">
           <BloggerDetails
             profileImg="./src/assets/blog1.jpg"
-            profileName="Faseeha jamal"
-            userEmail="faseeha123@gmail.com"
+            profileName={ userName }
+            userEmail= { userEmail }
             isPrimary={true}
           />
           <button className="bg-zinc-200 px-5 py-2 textsm rounded-3xl flex m-auto my-5">

@@ -4,6 +4,7 @@ import Tag from '../components/common/Tag'
 import SearchField from '../components/common/SearchField'
 import BlogCard from '../components/common/BlogCard'
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom'
 
 function HomePage() {
   const username = useSelector((state) => state.userReducer.user.username)
@@ -24,7 +25,9 @@ function HomePage() {
                 <i class="fa-solid fa-bars text-2xl"></i>
               </a>
               <div className="hidden md:flex justify-center gap-5 text-sm  mt-5 border-b-[1px] border-gray-300 p-5 w-full  ">
-                <p className=" text-neutral-500 hover:text-black"> Home</p>
+               <Link to="/user/home">
+               <p className=" text-neutral-500 hover:text-black">Home</p>
+               </Link>
                 <select
                   name=""
                   id=""
@@ -37,9 +40,11 @@ function HomePage() {
                   <option value="Travel">Travel</option>
                   <option value="Business">Business</option>
                 </select>
+                <Link to="/user/profile">
                 <p className=" text-neutral-500 hover:text-black">
                   Profile
                 </p>
+                </Link>
                 <p className=" text-neutral-500 hover:text-black">
                   Aboute
                 </p>
