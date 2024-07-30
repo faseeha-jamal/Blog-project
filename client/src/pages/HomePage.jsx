@@ -1,14 +1,32 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../components/layout/Navbar'
 import Tag from '../components/common/Tag'
 import SearchField from '../components/common/SearchField'
 import BlogCard from '../components/common/BlogCard'
-import { useSelector } from 'react-redux';
+import axiosInstance from "../app/config"
 import { Link } from 'react-router-dom'
+import { setBlogs } from "../redux/reducers/userSlice"
+import { useDispatch, useSelector } from 'react-redux'
 
 function HomePage() {
-  const username = useSelector((state) => state.userReducer.user.username)
+  const dispatch = useDispatch()
+  const [loading,setLoading] = useState(true);
+     
+    useEffect(() => {
+      const fetchBlogs = async () => {
+        try {
+          const response = await axiosInstance.get("/blogs")
+          dispatch(setBlogs(response.data.blogs))
+          setLoading(false)
+        } catch (error) {
+           console.log("Error fetching blogs",error);
+           setLoading(false)
+        }
+      }
+      fetchBlogs();
+    }, [dispatch])
 
+    const userBlogs = useSelector((state) => state.userReducer.blogs)
   return (
     <div className="w-full  bg-whit text-white font-serif">
       <div className="w-full">
@@ -61,16 +79,29 @@ function HomePage() {
               {/* card div  */}
               <div className="w-full border-b-[1px] border-zinc-600 md:flex flex-wrap gap-5 lg:w-[100%]">
                 {/* cards */}
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName={username} text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName={username} text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName={username} text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName={username} text="How to Find the Video Games of Yor Youth"/>            
+                {loading ? (
+                  <p>Loading...</p>
+                ): userBlogs && userBlogs.length >= 1 ?(
+                  userBlogs.map((blog) =>(
+                    <BlogCard
+                     key={blog.blogId}
+                     blogId={blog.blogId}
+                     image={blog.image.url}
+                     profileImg={blog.image.url}
+                     profileName={blog.authorName}
+                     heading={blog.title}
+                     text={blog.paragraph}
+                    />
+                  ))
+                ):(
+                  <p> No blogs available </p>
+                )}           
               </div>
               
               {/* tag div  */}
               <div className="w-full lg:w-[30%]">
                 <div className=" m-auto mt-10 lg:w-full">
-                <SearchField type="text" placeHolder="Type key word and hit enter"/>  
+                <SearchField type="text" placeHolder="Type key word and hit enter" icone='search'/>  
                </div>       
                 
                   {/* catagaries div  */}

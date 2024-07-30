@@ -8,7 +8,7 @@ const Navbar = () => {
           <i class="fa-brands fa-github text-xl"></i>
         </div>
         <div className='w-[60%] md:w-[40%]'>
-        <SearchField type="text" placeHolder="Type Key Word To Search..."/>
+        <SearchField type="text" placeHolder="Type Key Word To Search..." icone="search"/>
         </div>
           </nav>
   )

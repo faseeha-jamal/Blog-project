@@ -1,12 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/layout/Navbar";
 import Tag from "../components/common/Tag";
 import BlogCard from "../components/common/BlogCard";
 import SearchField from "../components/common/SearchField";
 import Button from "../components/common/Button";
 import { Link } from "react-router-dom";
+import axiosInstence from "../app/config";
+import { setBlogs } from "../redux/reducers/userSlice"
+import { useDispatch, useSelector } from "react-redux";
+import { IoMenu } from "react-icons/io5";
 
 function LandingPage() {
+  const dispatch = useDispatch()
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    const fetchBlogs = async () => {
+     try {
+      const response = await axiosInstence.get("/blogs");
+      dispatch(setBlogs(response.data.blogs));
+      setLoading(false)
+     } catch (error) {
+       console.log("Error fetching blogs",error);
+       setLoading(false)
+     }
+    }
+    fetchBlogs()
+  }, [dispatch])
+  
+
+  const userBlogs = useSelector((state) => state.userReducer.blogs)
 
   const handelTagClick=(tag)=>{
     console.log(tag);
@@ -23,8 +46,8 @@ function LandingPage() {
             <h1 className="text-4xl text-center">BLOG APP NAME</h1>
             {/* Blog name nav  */}
             <nav className=" ">
-              <a href="/" className="md:hidden">
-                <i class="fa-solid fa-bars text-2xl"></i>
+              <a href="/" className="md:hidden text-2xl">
+                 <IoMenu />
               </a>
               <div className="hidden md:flex justify-center gap-5 text-sm  mt-5 border-b-[1px] border-gray-300 p-5 w-full  ">
               <Link to="/home"><p className=" text-neutral-500 hover:text-black"> Home</p></Link>
@@ -72,16 +95,28 @@ function LandingPage() {
               {/* card div  */}
               <div className="w-full border-b-[1px] border-zinc-600 md:flex flex-wrap gap-5 lg:w-[100%]">
                 {/* cards */}
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName="Faseeha Jamal vattoli" text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName="Faseeha Jamal vattoli" text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName="Faseeha Jamal vattoli" text="How to Find the Video Games of Yor Youth"/>
-                <BlogCard image="./src/assets/blog.jpg" profileImg="./src/assets/blog1.jpg" profileName="Faseeha Jamal vattoli" text="How to Find the Video Games of Yor Youth"/>            
+                {loading ? (
+                  <p>Loading...</p>
+                ): userBlogs && userBlogs.length >= 1 ?(
+                  userBlogs.map((blog) =>(
+                    <BlogCard
+                     key={blog._id}
+                     image={blog.image.url}
+                     profileImg={blog.image.url}
+                     profileName={blog.authorName}
+                     heading={blog.title}
+                     text={blog.paragraph}
+                    />
+                  ))
+                ):(
+                  <p> No blogs available </p>
+                )}          
               </div>
               
               {/* tag div  */}
               <div className="w-full lg:w-[30%]">
                 <div className=" m-auto mt-10 lg:w-full">
-                <SearchField type="text" placeHolder="Type key word and hit enter"/>  
+                <SearchField type="text" placeHolder="Type key word and hit enter" icone="search"/>  
                </div>       
                 
                   {/* catagaries div  */}

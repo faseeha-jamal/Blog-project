@@ -9,6 +9,7 @@ import { signinValidation } from "../utils/validations/signinValidation.js";
 import { blogUploadValidation } from "../utils/validations/blogUploadValidation.js";
 import blogModel from "../models/blogModel.js";
 import {singleFileUpload} from "../middlewares/cloudinary.js"
+import saveBlogModel from "../models/saveBlogModel.js";
 
 
 export const userSignupController = async (req, res, next) => {
@@ -63,7 +64,7 @@ export const userSignupController = async (req, res, next) => {
         email: savedUser.email,
       },
       "secretkey",
-      { expiresIn: 60*10 }
+      { expiresIn: 60*60*24*7 }
     );
 
     const otp = generateOtp();
@@ -186,7 +187,7 @@ export const signinController = async (req, res, next) => {
       return res.status(400).json({
         status: 400,
         success: false,
-        message: "Email deosen't exist",
+        message: "User not found!",
       });
     }
 
@@ -196,7 +197,7 @@ export const signinController = async (req, res, next) => {
       return res.status(400).json({
         status: 400,
         success: false,
-        message: "Password not a match",
+        message: "Wrong password!",
       });
     }
 
@@ -260,7 +261,7 @@ export const blogUploadController = async (req, res, next) => {
         return res.status(400).json({
           status:400,
           success:false,
-          message: error.message
+          message:error.message
         })
       }
 
@@ -291,12 +292,154 @@ export const blogUploadController = async (req, res, next) => {
 }
 
 
+export const blogListController = async ( req, res, next ) => {
+    try {
+      const blogs = await blogModel.find().populate("authorId","username");
+     
+      const blogList = blogs.map((blog)=>{
+        if(blog._id && blog.authorId && blog.authorId._id){
+          return {
+            blogId: blog._id,
+            title: blog.title,
+            image: blog.image,
+            paragraph: blog.paragraph,
+            authorId: blog.authorId._id,
+            authorName: blog.authorId.username
+          }
+        }else{
+          console.log("this blog in else",blog);
+        }
+
+      })
+      console.log("here is the blog list",blogList);
+      return res.status(200).json({
+        status:200,
+        success:true,
+        message:"List of blogs",
+        blogs:blogList
+      });
+      
+    } catch (error) {
+      console.log("this is error from bloglist",error);
+      return next(error)    
+    }
+}
+
+export const myBlogsController = async ( req, res, next) => {
+    try { 
+      const userId = req.verifyToken.userId;
+      const blogs = await blogModel.find({authorId:userId}).populate("authorId","username");
+      console.log("this is my blog blogs",blogs);
+
+      const blogList = blogs.map((blog) => {
+        return {
+          blogId: blog._id,
+          title: blog.title,
+          image: blog.image,
+          paragraph: blog.paragraph,
+          authorId: blog.authorId._id,
+          authorName: blog.authorId.username
+        }
+      })
+
+      return res.status(200).json({
+        status:200,
+        success:true,
+        message:"List of blogs",
+        blogs:blogList
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        status: 500,
+        success: false,
+        message: "Internal Server Error",
+        error: error.message
+      });
+    }
+}
 
 
+export const saveBlogController = async (req, res, next) => {
+    try {
+      const { blogId } =req.params;
+      console.log("this is blog id",blogId);
+      const userId = req.verifyToken.userId;
+      console.log("this is user id",userId);
+
+      const existingSavedBlog = await saveBlogModel.findOne({ userId:userId, blogIds: { $in: [blogId]}});
+      
+      if(existingSavedBlog){
+        res.status(400).json({
+          status:400,
+          success:false,
+          message:"This blog is already saved"
+        })
+      } 
+
+      const savedBlog = await saveBlogModel.findOneAndUpdate({ userId},{$addToSet:{blogIds:blogId}},{upsert:true,new:true})
+
+    
+      res.status(200).json({
+              status:200,
+              success:true,
+              message:"Blog saved successfully",
+              saveBlog:savedBlog
+            })
+
+    } catch (error) {
+      return next(error)
+    }
+}
 
 
+export const saveBlogListController = async (req, res, next) => {
+  try {
+    const userId = req.verifyToken.userId;
 
+    // Retrieve the saved blog IDs for the user
+    const savedBlogs = await saveBlogModel.findOne({ userId })
+    console.log("This is savedBlogs",savedBlogs);
 
+    if (!savedBlogs || !savedBlogs.blogIds || savedBlogs.blogIds.length === 0) {
+      return res.status(200).json({
+        status: 200,
+        success: true,
+        message: "No blogs saved by the user",
+        savedBlogs: [],
+      });
+    }
+
+    // Retrieve the details of the saved blogs
+    const savedBlogIds = savedBlogs.blogIds;
+    console.log("This is savedBlogIds",savedBlogIds);
+    const savedBlogDetails = await blogModel.find({ _id: { $in: savedBlogIds } }).populate("authorId", "username");
+    console.log("this is save blog details",savedBlogDetails);
+
+    const savedBlogList = savedBlogDetails.map((blog) => ({
+      blogId: blog._id,
+      title: blog.title,
+      image: blog.image,
+      paragraph: blog.paragraph,
+      authorId: blog.authorId._id,
+      authorName: blog.authorId.username,
+    }));
+
+    return res.status(200).json({
+      status: 200,
+      success: true,
+      message: "List of saved blogs for the user",
+      savedBlogs: savedBlogList,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
 
 
 export const getForgetPasswordControll = async (req, res, next) => {
@@ -320,3 +463,4 @@ export const getForgetPasswordControll = async (req, res, next) => {
 export const postForgetPasswordControll = async (req, res, next) => {
      
 }
+

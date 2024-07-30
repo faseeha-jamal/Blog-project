@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import {useNavigate} from "react-router-dom"
+import React, { useState } from "react";
+import {Link, useNavigate} from "react-router-dom"
 import { useFormik } from "formik";
 import {validationSchema} from "../utils/validations/signupValidation"
 import { useDispatch } from 'react-redux';
@@ -7,6 +7,7 @@ import InputField from "../components/common/InputField";
 import Button from "../components/common/Button";
 import axiosIntance from "../app/config.js"
 import { setVerifyToken } from "../redux/reducers/userSlice";
+
 
 function SignupPage() {
   const dispatch = useDispatch()
@@ -27,14 +28,21 @@ function SignupPage() {
             email:values.email,
             password:values.password
           });
-
+        
           dispatch(setVerifyToken(response.data.verifyToken))
           
           navigate('/otp')
          
-          console.log("this is ",response);
+          console.log("this is signup response",response);
+
+
         } catch (error) {
-           console.log("this is cath",error);
+           console.log("this is signup cath",error);
+           console.log(error.response.data.message);
+           if(error.response.data.message){
+            window.alert(error.response.data.message)
+           }
+           
         }
       console.log("this is values", values);
     },
@@ -54,6 +62,7 @@ function SignupPage() {
                 placeHolder="Username"
                 onChange={formik.handleChange}
                 value={formik.values.username}
+                icon="user"
               />
               {formik.touched.username && formik.errors.username && (
                 <p className="text-red-700 text-sm text-left">{formik.errors.username}</p>
@@ -64,6 +73,7 @@ function SignupPage() {
                 placeHolder="Email"
                 onChange={formik.handleChange}
                 value={formik.values.email}
+                icon="email"
               />
               {formik.touched.email && formik.errors.email && (
                 <p className="text-sm text-red-700 text-left">{formik.errors.email}</p>
@@ -74,6 +84,7 @@ function SignupPage() {
                 placeHolder="Password"
                 onChange={formik.handleChange}
                 value={formik.values.password}
+                icon="password"
               />
               {formik.touched.password && formik.errors.password && (
                 <p className="text-sm text-red-700 text-left"> {formik.errors.password} </p>
@@ -84,6 +95,7 @@ function SignupPage() {
                 placeHolder="Confirm Password"
                 onChange={formik.handleChange}
                 value={formik.values.confirmPassword}
+                icon="password"
               />
                {formik.touched.confirmPassword && formik.errors.confirmPassword && (
                 <p className="text-sm text-red-700 text-left"> {formik.errors.confirmPassword} </p>
@@ -96,7 +108,10 @@ function SignupPage() {
               <span className="text-zinc-700">Privacy Policy</span>
             </p>
             <p className="text-sm mt-4">
-              Already Signing Up?<span className="text-zinc-700">Signin</span>
+              Already Signing Up?
+              <Link to='/signin'>
+              <span className="text-zinc-700">Signin</span>
+              </Link>
             </p>
           </div>
           {/* imag section  */}

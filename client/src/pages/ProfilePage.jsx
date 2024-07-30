@@ -5,17 +5,21 @@ import { validationSchema } from "../utils/validations/profileValidation";
 import { BloggerDetails } from "../components/common/BloggerDetails";
 import Button from "../components/common/Button";
 import { UserProfile } from "../components/common/UserProfile";
-import BlogCard from "../components/common/BlogCard";
 import InputField from "../components/common/InputField";
 import { Modal } from "../components/common/Modal";
-import  {axiosPrivate}  from "../app/config.js";
+import { axiosPrivate } from "../app/config.js";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setLogout } from "../redux/reducers/userSlice";
+import MyBlog from "../components/common/MyBlog.jsx";
+import SavedBlog from "../components/common/SavedBlog.jsx";
 
 const ProfilePage = () => {
-  const userName = useSelector((state) => state.userReducer.user.username)
-  const userEmail = useSelector((state) => state.userReducer.user.email)
-  const token = useSelector((state) => state.userReducer.tokens.verifyToken)
-  const axiosInstance = axiosPrivate(token)
+  const userName = useSelector((state) => state.userReducer.user.username);
+  const userEmail = useSelector((state) => state.userReducer.user.email);
+  const token = useSelector((state) => state.userReducer.tokens.accessToken);
+  const axiosinstance = axiosPrivate(token);
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -25,27 +29,49 @@ const ProfilePage = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log("onsubmit clicked");  
+      console.log("onsubmit clicked");
       try {
         const formData = new FormData();
-        formData.append("title",values.title);
-        formData.append("paragraph",values.paragraph);
-        formData.append("image",values.image);
+        formData.append("title", values.title);
+        formData.append("paragraph", values.paragraph);
+        formData.append("image", values.image);
 
         console.log("ready to trigger");
 
-        const response = await axiosInstance.post("/blog",formData,{
-          headers:{
-            "Content-type":"multipart/form-data"
-          }
-        })
-        console.log("this is response",response);
+        const response = await axiosinstance.post("/blog", formData, {
+          headers: {
+            "Content-type": "multipart/form-data",
+          },
+        });
+        console.log("this is response", response);
       } catch (error) {
-         console.log("this is catch error",error);
+        console.log("this is catch error", error);
       }
     },
   });
-  const [myBlogs, setMyBlogs] = useState(false);
+
+  const handleLogout = () => {
+    dispatch(setLogout());
+  };
+  
+  const handleMyBlogsClick = () => {
+    setMyBlog(true);
+    setSavedBlogs(false);
+    setEditProfile(false);
+  };
+
+  const handleSavedBlogsClick = () => {
+    setMyBlog(false);
+    setSavedBlogs(true);
+    setEditProfile(false);
+  };
+
+  const handleEditProfileClick = () => {
+    setMyBlog(false);
+    setSavedBlogs(false);
+    setEditProfile(true);
+  };
+  const [myBlogs, setMyBlog] = useState(false);
   const [savedBlogs, setSavedBlogs] = useState(false);
   const [editProfile, setEditProfile] = useState(false);
   const [showmodal, setShowModal] = useState(false);
@@ -62,9 +88,9 @@ const ProfilePage = () => {
               <i class="fa-solid fa-bars text-4xl"></i>
             </a>
             <div className="hidden md:flex justify-center gap-5 text-sm  mt-5 border-b-[1px] border-gray-300 p-5 w-full  ">
-            <Link to="/user/home">
-               <p className=" text-neutral-500 hover:text-black">Home</p>
-            </Link>
+              <Link to="/user/home">
+                <p className=" text-neutral-500 hover:text-black">Home</p>
+              </Link>
               <select
                 name=""
                 id=""
@@ -89,11 +115,14 @@ const ProfilePage = () => {
         <div className="w-full md:w-[30%] md:border-r-[1px] ">
           <BloggerDetails
             profileImg="./src/assets/blog1.jpg"
-            profileName={ userName }
-            userEmail= { userEmail }
+            profileName={userName}
+            userEmail={userEmail}
             isPrimary={true}
           />
-          <button className="bg-zinc-200 px-5 py-2 textsm rounded-3xl flex m-auto my-5">
+          <button
+            className="bg-zinc-200 px-5 py-2 textsm rounded-3xl flex m-auto my-5"
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </div>
@@ -102,69 +131,34 @@ const ProfilePage = () => {
             text="My Blogs"
             isPrimary={true}
             isFull={true}
-            onClick={() => {
-              setMyBlogs(true);
-            }}
+            onClick={handleMyBlogsClick}
           />{" "}
           <br />
           <Button
             text="Saved Blogs"
             isPrimary={true}
             isFull={true}
-            onClick={() => setSavedBlogs(true)}
+            onClick={handleSavedBlogsClick}
           />{" "}
           <br />
           <Button
             text="Edit profile"
             isPrimary={true}
             isFull={true}
-            onClick={() => setEditProfile(true)}
+            onClick={handleEditProfileClick}
           />
         </div>
       </div>
-      <div>
-        <UserProfile isVisible={myBlogs} onClose={() => setMyBlogs(false)}>
-          <div className="py-2 text-center">
-            <h2 className="text-xl">My Blogs....</h2>
-            <div className="md:flex gap-10">
-              <BlogCard
-                image="./src/assets/blog.jpg"
-                profileImg="./src/assets/blog1.jpg"
-                profileName="Faseeha Jamal vattoli"
-                text="How to Find the Video Games of Yor Youth"
-              />
-              <BlogCard
-                image="./src/assets/blog.jpg"
-                profileImg="./src/assets/blog1.jpg"
-                profileName="Faseeha Jamal vattoli"
-                text="How to Find the Video Games of Yor Youth"
-              />
-            </div>
-          </div>
-        </UserProfile>
-
-        <UserProfile
-          isVisible={savedBlogs}
-          onClose={() => setSavedBlogs(false)}
-        >
-          <div className="py-2 text-center">
-            <h2 className="text-xl">Saved Blogs....</h2>
-            <div className="md:flex gap-5">
-              <BlogCard
-                image="./src/assets/blog.jpg"
-                profileImg="./src/assets/blog1.jpg"
-                profileName="Faseeha Jamal vattoli"
-                text="How to Find the Video Games of Yor Youth"
-              />
-              <BlogCard
-                image="./src/assets/blog.jpg"
-                profileImg="./src/assets/blog1.jpg"
-                profileName="Faseeha Jamal vattoli"
-                text="How to Find the Video Games of Yor Youth"
-              />
-            </div>
-          </div>
-        </UserProfile>
+      <div className="py-20">
+         {myBlogs ? (
+          <MyBlog/>
+         ): savedBlogs ?(
+          <SavedBlog />
+         ):(
+           ""
+         ) 
+         }
+      </div>
 
         <UserProfile
           isVisible={editProfile}
@@ -180,15 +174,17 @@ const ProfilePage = () => {
               type="text"
               placeHolder="Enter You'r new username"
               name="username"
+              icon="user"
             />
             <InputField
               type="email"
               placeHolder="Enter You'r new email"
               name="email"
+              icon="email"
             />
           </div>
         </UserProfile>
-      </div>
+      
 
       <div className="fixed">
         <button
@@ -250,8 +246,12 @@ const ProfilePage = () => {
                   }}
                   onBlur={formik.handleBlur}
                 />
-                {selectedImage &&(
-                  <img src={selectedImage} alt="" className="w-[50px] h-[50px]" />
+                {selectedImage && (
+                  <img
+                    src={selectedImage}
+                    alt=""
+                    className="w-[50px] h-[50px]"
+                  />
                 )}
               </div>
               {formik.touched.image && formik.errors.image && (

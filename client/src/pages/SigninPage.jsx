@@ -2,8 +2,8 @@ import React from "react";
 import { useFormik } from "formik";
 import { validationSchema } from "../utils/validations/signinValidation.js";
 import axiosIntance from "../app/config.js"
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import InputField from "../components/common/InputField";
 import Button from "../components/common/Button";
 import { setAccesToken, setUser } from "../redux/reducers/userSlice";
@@ -11,7 +11,7 @@ import { setAccesToken, setUser } from "../redux/reducers/userSlice";
 
 function SigninPage() {
   const dispatch = useDispatch();
-  const navigatae = useNavigate()
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -25,11 +25,12 @@ function SigninPage() {
           email:values.email,
           password:values.password
         })
-
-        dispatch(setAccesToken(response.data.accesToken))
+        console.log("sign in response data",response.data);
+        
+        dispatch(setAccesToken(response.data.accessToken))
         dispatch(setUser(response.data.user))
 
-        navigatae("/user/home")
+        navigate("/user/home")
 
       } catch (error) {
         console.log("this catch error",error);
@@ -55,6 +56,7 @@ function SigninPage() {
                 placeHolder="Email"
                 onChange={formik.handleChange} 
                 value={formik.values.email}
+                icon="email"
                 />
                 {formik.touched.email && formik.errors.email && (
                   <p className="text-sm text-left text-red-700"> {formik.errors.email} </p>
@@ -65,6 +67,7 @@ function SigninPage() {
                 name="password"
                 onChange={formik.handleChange} 
                 value={formik.values.password}
+                icon="password"
               />
               {formik.touched.password && formik.errors.password && (
                 <p className="text-sm text-left text-red-700"> {formik.errors.password} </p>
@@ -74,7 +77,9 @@ function SigninPage() {
             <Button text="Sign-in" isPrimary={true} onClick={formik.submitForm} />
             <p className="text-sm m-10">
               Don't have an Account?
+              <Link to="/signup">
               <span className="text-zinc-700">Signup</span>
+              </Link>
             </p>
           </div>
           {/* imag section  */}

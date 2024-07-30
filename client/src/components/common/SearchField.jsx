@@ -1,4 +1,7 @@
 import React from 'react'
+import { GiAbbotMeeple,GiAbstract013,GiAbstract017 } from "react-icons/gi";
+import { IoSearchSharp } from "react-icons/io5";
+
 
 function SearchField({type,placeHolder,icone}) {
   return (
@@ -6,11 +9,12 @@ function SearchField({type,placeHolder,icone}) {
     <input
       type={type}
       placeholder={placeHolder}
-      className="text-sm bg-transparent border-none px-5 w-full"
+      className="text-sm bg-transparent border-none px-5 w-full outline-none"
+      
     />
-    <p className='px-2'>
-      <i className="fa-solid fa-magnifying-glass text-xs"></i>
-    </p>
+    {icone === "search" ? <IoSearchSharp /> : 
+    icone === "f" ? <GiAbstract017 /> : <GiAbstract013 /> }
+     
   </div>
   )
 }

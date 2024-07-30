@@ -32,7 +32,7 @@ function OtpPage() {
           otp: values.otp,
           verifyToken: values.verifyToken,
         });
-
+        console.log("verify otp response data",response.data);
         dispatch(setUser(response.data.user));
         dispatch(setAccesToken(response.data.accessToken))
 

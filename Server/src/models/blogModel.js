@@ -1,4 +1,5 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+
 
 const blogUploadSchema = new mongoose.Schema({
     title:{
@@ -25,6 +26,7 @@ const blogUploadSchema = new mongoose.Schema({
     },
     authorId:{
         type:mongoose.Schema.Types.ObjectId,
+        ref:'user',
         required:true
     }
 }, {timestamps:true})

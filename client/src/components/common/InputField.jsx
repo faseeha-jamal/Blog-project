@@ -1,4 +1,5 @@
 import React from "react";
+import { HiOutlineUser,HiOutlineKey,HiOutlineMail,HiOutlineHashtag } from "react-icons/hi";
 
 function InputField({type,placeHolder,icon,name,onChange,value}) {
   return (
@@ -11,7 +12,11 @@ function InputField({type,placeHolder,icon,name,onChange,value}) {
        value={value}
        />
        
-      <i className="fa-regular fa-user"></i>
+      {icon == "user" ? <HiOutlineUser /> 
+       : icon == "password" ? <HiOutlineKey />
+       : icon == "email"? <HiOutlineMail />
+       :<HiOutlineHashtag /> }
+
     </div>
   );
 }
